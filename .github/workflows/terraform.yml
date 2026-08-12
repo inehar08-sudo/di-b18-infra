@@ -12,8 +12,10 @@ permissions:
 
 jobs:
 
-  terraform-plan:
-    name: Terraform Plan
+  terraform-feature-plan:
+    name: Terraform Plan - Feature
+
+    if: startsWith(github.ref, 'refs/heads/feature/')
 
     runs-on: ubuntu-latest
 
@@ -25,7 +27,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ${{ github.ref == 'refs/heads/main' && 'environment/prod' || 'environment/preprod' }}
+        working-directory: environment/preprod
 
     steps:
 
@@ -48,22 +50,17 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+      - name: Terraform Format
+        run: terraform fmt
+
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
-
-      - name: Upload Terraform Plan
-        uses: actions/upload-artifact@v4
-        with:
-          name: terraform-plan
-          path: ${{ github.ref == 'refs/heads/main' && 'environment/prod/tfplan' || 'environment/preprod/tfplan' }}
+        run: terraform plan
 
 
-  terraform-apply:
-    name: Terraform Apply
+  terraform-main:
+    name: Terraform Plan and Apply - Main
 
     if: github.ref == 'refs/heads/main'
-
-    needs: terraform-plan
 
     runs-on: ubuntu-latest
 
@@ -92,14 +89,17 @@ jobs:
           tenant-id: "8bba23c6-05e0-40e7-b88f-b8e386da422f"
           subscription-id: "3008a893-f5d9-4f23-bca6-0665693b4dc9"
 
-      - name: Download Terraform Plan
-        uses: actions/download-artifact@v4
-        with:
-          name: terraform-plan
-          path: environment/prod
-
       - name: Terraform Init
         run: terraform init
 
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Format
+        run: terraform fmt
+
+      - name: Terraform Plan
+        run: terraform plan
+
       - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve
