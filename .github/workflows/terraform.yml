@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: production
+      name: prod
 
     env:
       TF_IN_AUTOMATION: true
