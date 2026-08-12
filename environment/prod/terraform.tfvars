@@ -18,7 +18,7 @@ sa = {
   }
   sa2 = {
     name                     = "telemetrystore23"
-    resource_group_name      = "rg-prod-001"
+    resource_group_name      = "rg-prod-002"
     location                 = "westus"
     account_tier             = "Standard"
     account_replication_type = "GRS"
